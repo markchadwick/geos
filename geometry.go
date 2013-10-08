@@ -32,6 +32,13 @@ func GeomFromHex(wkt string) (*Geometry, error) {
 }
 
 // ----------------------------------------------------------------------------
+// Util methods
+
+func (g *Geometry) WKT() string {
+	return DefaultWKTWriter.Write(g)
+}
+
+// ----------------------------------------------------------------------------
 // Linearref methods
 
 func (g *Geometry) Project(g1 *Geometry) float64 {
