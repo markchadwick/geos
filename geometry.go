@@ -17,8 +17,35 @@ type Geometry struct {
 	geom *C.GEOSGeometry
 }
 
+// ----------------------------------------------------------------------------
+// Factory functions
+
 func GeomFromWKT(wkt string) (*Geometry, error) {
 	return DefaultWKTReader.Read(wkt)
+}
+
+func NewPoint(cs *CoordSequence) (*Geometry, error) {
+	geom := C.GEOSGeom_createPoint(cs.cs)
+	if geom == nil {
+		return nil, GEOSError
+	}
+	return &Geometry{geom}, nil
+}
+
+func NewLinearRing(cs *CoordSequence) (*Geometry, error) {
+	geom := C.GEOSGeom_createLinearRing(cs.cs)
+	if geom == nil {
+		return nil, GEOSError
+	}
+	return &Geometry{geom}, nil
+}
+
+func NewLineString(cs *CoordSequence) (*Geometry, error) {
+	geom := C.GEOSGeom_createLineString(cs.cs)
+	if geom == nil {
+		return nil, GEOSError
+	}
+	return &Geometry{geom}, nil
 }
 
 // TODO
@@ -36,6 +63,12 @@ func GeomFromHex(wkt string) (*Geometry, error) {
 
 func (g *Geometry) WKT() string {
 	return DefaultWKTWriter.Write(g)
+}
+
+// TODO: Not really the right way to do this
+func (g *Geometry) Poly() *Geometry {
+	geom := C.GEOSGeom_createPolygon(g.geom, nil, 0)
+	return &Geometry{geom}
 }
 
 // ----------------------------------------------------------------------------
