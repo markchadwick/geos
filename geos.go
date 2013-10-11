@@ -12,10 +12,14 @@ import "C"
 var (
 	DefaultWKTReader *WKTReader
 	DefaultWKTWriter *WKTWriter
+	DefaultWKBReader *WKBReader
+	DefaultWKBWriter *WKBWriter
 )
 
 func init() {
 	C.initializeGEOS()
 	DefaultWKTReader = NewWKTReader()
 	DefaultWKTWriter = NewWKTWriter()
+	DefaultWKBReader = NewWKBReader()
+	DefaultWKBWriter = NewWKBWriter()
 }

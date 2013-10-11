@@ -24,6 +24,10 @@ func GeomFromWKT(wkt string) (*Geometry, error) {
 	return DefaultWKTReader.Read(wkt)
 }
 
+func GeomFromWKB(wkb []byte) (*Geometry, error) {
+	return DefaultWKBReader.Read(wkb)
+}
+
 func NewPoint(cs *CoordSequence) (*Geometry, error) {
 	geom := C.GEOSGeom_createPoint(cs.cs)
 	if geom == nil {
@@ -48,21 +52,15 @@ func NewLineString(cs *CoordSequence) (*Geometry, error) {
 	return &Geometry{geom}, nil
 }
 
-// TODO
-func GeomFromWKB(wkt string) (*Geometry, error) {
-	return nil, nil
-}
-
-// TODO
-func GeomFromHex(wkt string) (*Geometry, error) {
-	return nil, nil
-}
-
 // ----------------------------------------------------------------------------
 // Util methods
 
 func (g *Geometry) WKT() string {
 	return DefaultWKTWriter.Write(g)
+}
+
+func (g *Geometry) WKB() []byte {
+	return DefaultWKBWriter.Write(g)
 }
 
 // TODO: Not really the right way to do this
