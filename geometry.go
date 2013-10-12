@@ -1,8 +1,8 @@
 package geos
 
 import (
-	// "unsafe"
 	"errors"
+	"runtime"
 )
 
 // #include <stdlib.h>
@@ -15,6 +15,18 @@ var (
 
 type Geometry struct {
 	geom *C.GEOSGeometry
+}
+
+func geometry(geom *C.GEOSGeometry) *Geometry {
+	g := &Geometry{
+		geom: geom,
+	}
+	runtime.SetFinalizer(g, destroyGeometry)
+	return g
+}
+
+func destroyGeometry(g *Geometry) {
+	C.GEOSGeom_destroy(g.geom)
 }
 
 // ----------------------------------------------------------------------------
@@ -33,7 +45,7 @@ func NewPoint(cs *CoordSequence) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func NewLinearRing(cs *CoordSequence) (*Geometry, error) {
@@ -41,7 +53,7 @@ func NewLinearRing(cs *CoordSequence) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func NewLineString(cs *CoordSequence) (*Geometry, error) {
@@ -49,7 +61,7 @@ func NewLineString(cs *CoordSequence) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 // ----------------------------------------------------------------------------
@@ -66,6 +78,7 @@ func (g *Geometry) WKB() []byte {
 // TODO: Not really the right way to do this
 func (g *Geometry) Poly() *Geometry {
 	geom := C.GEOSGeom_createPolygon(g.geom, nil, 0)
+	// Not GC'd -- handle by g
 	return &Geometry{geom}
 }
 
@@ -79,7 +92,7 @@ func (g *Geometry) Project(g1 *Geometry) float64 {
 
 func (g *Geometry) Interpolate(d float64) *Geometry {
 	geom := C.GEOSInterpolate(g.geom, C.double(d))
-	return &Geometry{geom}
+	return geometry(geom)
 }
 
 func (g *Geometry) ProjectNormalized(g1 *Geometry) float64 {
@@ -89,7 +102,7 @@ func (g *Geometry) ProjectNormalized(g1 *Geometry) float64 {
 
 func (g *Geometry) InterpolateNormalized(d float64) *Geometry {
 	geom := C.GEOSInterpolateNormalized(g.geom, C.double(d))
-	return &Geometry{geom}
+	return geometry(geom)
 }
 
 // ----------------------------------------------------------------------------
@@ -115,7 +128,7 @@ func (g *Geometry) Buffer(width float64, quadsegs int) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) BufferWithStyle(width float64, quadsegs int,
@@ -125,7 +138,7 @@ func (g *Geometry) BufferWithStyle(width float64, quadsegs int,
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) SingleSidedBuffer(width int64, quadsegs int,
@@ -135,7 +148,7 @@ func (g *Geometry) SingleSidedBuffer(width int64, quadsegs int,
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 // ----------------------------------------------------------------------------
@@ -146,7 +159,7 @@ func (g *Geometry) Envelope() (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) Intersection(g1 *Geometry) (*Geometry, error) {
@@ -154,7 +167,7 @@ func (g *Geometry) Intersection(g1 *Geometry) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) ConvexHull() (*Geometry, error) {
@@ -162,7 +175,7 @@ func (g *Geometry) ConvexHull() (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) Difference(g1 *Geometry) (*Geometry, error) {
@@ -170,7 +183,7 @@ func (g *Geometry) Difference(g1 *Geometry) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) SymDifference(g1 *Geometry) (*Geometry, error) {
@@ -178,7 +191,7 @@ func (g *Geometry) SymDifference(g1 *Geometry) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) Boundary() (*Geometry, error) {
@@ -186,7 +199,7 @@ func (g *Geometry) Boundary() (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) Union(g1 *Geometry) (*Geometry, error) {
@@ -194,7 +207,7 @@ func (g *Geometry) Union(g1 *Geometry) (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) UnionCascaded() (*Geometry, error) {
@@ -202,7 +215,7 @@ func (g *Geometry) UnionCascaded() (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) PointOnSurface() (*Geometry, error) {
@@ -210,7 +223,7 @@ func (g *Geometry) PointOnSurface() (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (g *Geometry) GetCentroid() (*Geometry, error) {
@@ -218,7 +231,7 @@ func (g *Geometry) GetCentroid() (*Geometry, error) {
 	if geom == nil {
 		return nil, GEOSError
 	}
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 // ----------------------------------------------------------------------------
