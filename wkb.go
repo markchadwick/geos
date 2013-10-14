@@ -35,7 +35,7 @@ func (r *WKBReader) Read(wkb []byte) (*Geometry, error) {
 		return nil, fmt.Errorf("Malformed WKB: %s", wkb)
 	}
 
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (r *WKBReader) ReadHex(wkb []byte) (*Geometry, error) {
@@ -47,7 +47,7 @@ func (r *WKBReader) ReadHex(wkb []byte) (*Geometry, error) {
 		return nil, fmt.Errorf("Malformed WKB Hex: %s", wkb)
 	}
 
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (r *WKBReader) Destroy() {

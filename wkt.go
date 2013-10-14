@@ -29,7 +29,7 @@ func (r *WKTReader) Read(wkt string) (*Geometry, error) {
 		return nil, fmt.Errorf("Malformed WKT: %s", wkt)
 	}
 
-	return &Geometry{geom}, nil
+	return geometry(geom), nil
 }
 
 func (r *WKTReader) Destroy() {

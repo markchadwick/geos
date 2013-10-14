@@ -2,7 +2,7 @@ package geos
 
 import (
 	"errors"
-	"runtime"
+	// "runtime"
 )
 
 // #include <stdlib.h>
@@ -21,7 +21,7 @@ func geometry(geom *C.GEOSGeometry) *Geometry {
 	g := &Geometry{
 		geom: geom,
 	}
-	runtime.SetFinalizer(g, destroyGeometry)
+	// runtime.SetFinalizer(g, destroyGeometry)
 	return g
 }
 
