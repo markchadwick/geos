@@ -2,7 +2,6 @@ package geos
 
 import (
 	"errors"
-	// "runtime"
 )
 
 // #include <stdlib.h>
@@ -21,12 +20,7 @@ func geometry(geom *C.GEOSGeometry) *Geometry {
 	g := &Geometry{
 		geom: geom,
 	}
-	// runtime.SetFinalizer(g, destroyGeometry)
 	return g
-}
-
-func destroyGeometry(g *Geometry) {
-	C.GEOSGeom_destroy(g.geom)
 }
 
 // ----------------------------------------------------------------------------
@@ -73,6 +67,10 @@ func (g *Geometry) WKT() string {
 
 func (g *Geometry) WKB() []byte {
 	return DefaultWKBWriter.Write(g)
+}
+
+func (g *Geometry) Destroy() {
+	C.GEOSGeom_destroy(g.geom)
 }
 
 // TODO: Not really the right way to do this
