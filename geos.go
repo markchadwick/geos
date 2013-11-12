@@ -5,11 +5,12 @@ package geos
 #include <stdlib.h>
 #include <geos_c.h>
 
-extern void initializeGEOS();
+extern GEOSContextHandle_t initializeGEOS();
 */
 import "C"
 
 var (
+	ctx              C.GEOSContextHandle_t
 	DefaultWKTReader *WKTReader
 	DefaultWKTWriter *WKTWriter
 	DefaultWKBReader *WKBReader
@@ -17,7 +18,7 @@ var (
 )
 
 func init() {
-	C.initializeGEOS()
+	ctx = C.initializeGEOS()
 	DefaultWKTReader = NewWKTReader()
 	DefaultWKTWriter = NewWKTWriter()
 	DefaultWKBReader = NewWKBReader()

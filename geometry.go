@@ -35,7 +35,7 @@ func GeomFromWKB(wkb []byte) (*Geometry, error) {
 }
 
 func NewPoint(cs *CoordSequence) (*Geometry, error) {
-	geom := C.GEOSGeom_createPoint(cs.cs)
+	geom := C.GEOSGeom_createPoint_r(ctx, cs.cs)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -43,7 +43,7 @@ func NewPoint(cs *CoordSequence) (*Geometry, error) {
 }
 
 func NewLinearRing(cs *CoordSequence) (*Geometry, error) {
-	geom := C.GEOSGeom_createLinearRing(cs.cs)
+	geom := C.GEOSGeom_createLinearRing_r(ctx, cs.cs)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -51,7 +51,7 @@ func NewLinearRing(cs *CoordSequence) (*Geometry, error) {
 }
 
 func NewLineString(cs *CoordSequence) (*Geometry, error) {
-	geom := C.GEOSGeom_createLineString(cs.cs)
+	geom := C.GEOSGeom_createLineString_r(ctx, cs.cs)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -70,12 +70,12 @@ func (g *Geometry) WKB() []byte {
 }
 
 func (g *Geometry) Destroy() {
-	C.GEOSGeom_destroy(g.geom)
+	C.GEOSGeom_destroy_r(ctx, g.geom)
 }
 
 // TODO: Not really the right way to do this
 func (g *Geometry) Poly() *Geometry {
-	geom := C.GEOSGeom_createPolygon(g.geom, nil, 0)
+	geom := C.GEOSGeom_createPolygon_r(ctx, g.geom, nil, 0)
 	// Not GC'd -- handle by g
 	return &Geometry{geom}
 }
@@ -84,22 +84,22 @@ func (g *Geometry) Poly() *Geometry {
 // Linearref methods
 
 func (g *Geometry) Project(g1 *Geometry) float64 {
-	d := C.GEOSProject(g.geom, g1.geom)
+	d := C.GEOSProject_r(ctx, g.geom, g1.geom)
 	return float64(d)
 }
 
 func (g *Geometry) Interpolate(d float64) *Geometry {
-	geom := C.GEOSInterpolate(g.geom, C.double(d))
+	geom := C.GEOSInterpolate_r(ctx, g.geom, C.double(d))
 	return geometry(geom)
 }
 
 func (g *Geometry) ProjectNormalized(g1 *Geometry) float64 {
-	d := C.GEOSProjectNormalized(g.geom, g1.geom)
+	d := C.GEOSProjectNormalized_r(ctx, g.geom, g1.geom)
 	return float64(d)
 }
 
 func (g *Geometry) InterpolateNormalized(d float64) *Geometry {
-	geom := C.GEOSInterpolateNormalized(g.geom, C.double(d))
+	geom := C.GEOSInterpolateNormalized_r(ctx, g.geom, C.double(d))
 	return geometry(geom)
 }
 
@@ -122,7 +122,7 @@ const (
 )
 
 func (g *Geometry) Buffer(width float64, quadsegs int) (*Geometry, error) {
-	geom := C.GEOSBuffer(g.geom, C.double(width), C.int(quadsegs))
+	geom := C.GEOSBuffer_r(ctx, g.geom, C.double(width), C.int(quadsegs))
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -131,7 +131,7 @@ func (g *Geometry) Buffer(width float64, quadsegs int) (*Geometry, error) {
 
 func (g *Geometry) BufferWithStyle(width float64, quadsegs int,
 	endCapStyle CapStyle, joinStyle JoinStyle, mitreLimit float64) (*Geometry, error) {
-	geom := C.GEOSBufferWithStyle(g.geom, C.double(width), C.int(quadsegs),
+	geom := C.GEOSBufferWithStyle_r(ctx, g.geom, C.double(width), C.int(quadsegs),
 		C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit))
 	if geom == nil {
 		return nil, GEOSError
@@ -141,7 +141,7 @@ func (g *Geometry) BufferWithStyle(width float64, quadsegs int,
 
 func (g *Geometry) SingleSidedBuffer(width int64, quadsegs int,
 	joinStyle JoinStyle, mitreLimit float64, leftSide int) (*Geometry, error) {
-	geom := C.GEOSSingleSidedBuffer(g.geom, C.double(width), C.int(quadsegs),
+	geom := C.GEOSSingleSidedBuffer_r(ctx, g.geom, C.double(width), C.int(quadsegs),
 		C.int(joinStyle), C.double(mitreLimit), C.int(leftSide))
 	if geom == nil {
 		return nil, GEOSError
@@ -153,7 +153,7 @@ func (g *Geometry) SingleSidedBuffer(width int64, quadsegs int,
 // Topology Operations
 
 func (g *Geometry) Envelope() (*Geometry, error) {
-	geom := C.GEOSEnvelope(g.geom)
+	geom := C.GEOSEnvelope_r(ctx, g.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -161,7 +161,7 @@ func (g *Geometry) Envelope() (*Geometry, error) {
 }
 
 func (g *Geometry) Intersection(g1 *Geometry) (*Geometry, error) {
-	geom := C.GEOSIntersection(g.geom, g1.geom)
+	geom := C.GEOSIntersection_r(ctx, g.geom, g1.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -169,7 +169,7 @@ func (g *Geometry) Intersection(g1 *Geometry) (*Geometry, error) {
 }
 
 func (g *Geometry) ConvexHull() (*Geometry, error) {
-	geom := C.GEOSConvexHull(g.geom)
+	geom := C.GEOSConvexHull_r(ctx, g.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -177,7 +177,7 @@ func (g *Geometry) ConvexHull() (*Geometry, error) {
 }
 
 func (g *Geometry) Difference(g1 *Geometry) (*Geometry, error) {
-	geom := C.GEOSDifference(g.geom, g1.geom)
+	geom := C.GEOSDifference_r(ctx, g.geom, g1.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -185,7 +185,7 @@ func (g *Geometry) Difference(g1 *Geometry) (*Geometry, error) {
 }
 
 func (g *Geometry) SymDifference(g1 *Geometry) (*Geometry, error) {
-	geom := C.GEOSSymDifference(g.geom, g1.geom)
+	geom := C.GEOSSymDifference_r(ctx, g.geom, g1.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -193,7 +193,7 @@ func (g *Geometry) SymDifference(g1 *Geometry) (*Geometry, error) {
 }
 
 func (g *Geometry) Boundary() (*Geometry, error) {
-	geom := C.GEOSBoundary(g.geom)
+	geom := C.GEOSBoundary_r(ctx, g.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -201,7 +201,7 @@ func (g *Geometry) Boundary() (*Geometry, error) {
 }
 
 func (g *Geometry) Union(g1 *Geometry) (*Geometry, error) {
-	geom := C.GEOSUnion(g.geom, g1.geom)
+	geom := C.GEOSUnion_r(ctx, g.geom, g1.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -209,7 +209,7 @@ func (g *Geometry) Union(g1 *Geometry) (*Geometry, error) {
 }
 
 func (g *Geometry) UnionCascaded() (*Geometry, error) {
-	geom := C.GEOSUnionCascaded(g.geom)
+	geom := C.GEOSUnionCascaded_r(ctx, g.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -217,7 +217,7 @@ func (g *Geometry) UnionCascaded() (*Geometry, error) {
 }
 
 func (g *Geometry) PointOnSurface() (*Geometry, error) {
-	geom := C.GEOSPointOnSurface(g.geom)
+	geom := C.GEOSPointOnSurface_r(ctx, g.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -225,7 +225,7 @@ func (g *Geometry) PointOnSurface() (*Geometry, error) {
 }
 
 func (g *Geometry) GetCentroid() (*Geometry, error) {
-	geom := C.GEOSGetCentroid(g.geom)
+	geom := C.GEOSGetCentroid_r(ctx, g.geom)
 	if geom == nil {
 		return nil, GEOSError
 	}
@@ -255,38 +255,38 @@ func binaryPredicate(c C.char) (bool, error) {
 // TODO Relate Pattern
 
 func (g *Geometry) Disjoint(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSDisjoint(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSDisjoint_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) Touches(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSTouches(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSTouches_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) Intersects(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSIntersects(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSIntersects_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) Crosses(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSCrosses(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSCrosses_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) Within(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSWithin(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSWithin_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) Contains(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSContains(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSContains_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) Overlaps(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSOverlaps(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSOverlaps_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) Equals(g1 *Geometry) (bool, error) {
-	return binaryPredicate(C.GEOSEquals(g.geom, g1.geom))
+	return binaryPredicate(C.GEOSEquals_r(ctx, g.geom, g1.geom))
 }
 
 func (g *Geometry) EqualsExact(g1 *Geometry, tolerance float64) (bool, error) {
-	return binaryPredicate(C.GEOSEqualsExact(g.geom, g1.geom,
+	return binaryPredicate(C.GEOSEqualsExact_r(ctx, g.geom, g1.geom,
 		C.double(tolerance)))
 }

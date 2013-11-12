@@ -18,7 +18,7 @@ type WKBReader struct {
 
 func NewWKBReader() *WKBReader {
 	return &WKBReader{
-		r: C.GEOSWKBReader_create(),
+		r: C.GEOSWKBReader_create_r(ctx),
 	}
 }
 
@@ -30,7 +30,7 @@ func (r *WKBReader) Read(wkb []byte) (*Geometry, error) {
 	d := (*C.uchar)(unsafe.Pointer(&wkb[0]))
 	length := C.size_t(len(wkb))
 
-	geom := C.GEOSWKBReader_read(r.r, d, length)
+	geom := C.GEOSWKBReader_read_r(ctx, r.r, d, length)
 	if geom == nil {
 		return nil, fmt.Errorf("Malformed WKB: %s", wkb)
 	}
@@ -42,7 +42,7 @@ func (r *WKBReader) ReadHex(wkb []byte) (*Geometry, error) {
 	d := (*C.uchar)(unsafe.Pointer(&wkb[0]))
 	length := C.size_t(len(wkb))
 
-	geom := C.GEOSWKBReader_readHEX(r.r, d, length)
+	geom := C.GEOSWKBReader_readHEX_r(ctx, r.r, d, length)
 	if geom == nil {
 		return nil, fmt.Errorf("Malformed WKB Hex: %s", wkb)
 	}
@@ -51,7 +51,7 @@ func (r *WKBReader) ReadHex(wkb []byte) (*Geometry, error) {
 }
 
 func (r *WKBReader) Destroy() {
-	C.GEOSWKBReader_destroy(r.r)
+	C.GEOSWKBReader_destroy_r(ctx, r.r)
 }
 
 // ----------------------------------------------------------------------------
@@ -62,22 +62,22 @@ type WKBWriter struct {
 
 func NewWKBWriter() *WKBWriter {
 	return &WKBWriter{
-		w: C.GEOSWKBWriter_create(),
+		w: C.GEOSWKBWriter_create_r(ctx),
 	}
 }
 
 func (w *WKBWriter) Write(geom *Geometry) []byte {
 	size := C.size_t(1)
-	cs := C.GEOSWKBWriter_write(w.w, geom.geom, &size)
+	cs := C.GEOSWKBWriter_write_r(ctx, w.w, geom.geom, &size)
 	return C.GoBytes(unsafe.Pointer(cs), C.int(size))
 }
 
 func (w *WKBWriter) WriteHex(geom *Geometry) []byte {
 	size := C.size_t(1)
-	cs := C.GEOSWKBWriter_writeHEX(w.w, geom.geom, &size)
+	cs := C.GEOSWKBWriter_writeHEX_r(ctx, w.w, geom.geom, &size)
 	return C.GoBytes(unsafe.Pointer(cs), C.int(size))
 }
 
 func (w *WKBWriter) Destroy() {
-	C.GEOSWKBWriter_destroy(w.w)
+	C.GEOSWKBWriter_destroy_r(ctx, w.w)
 }

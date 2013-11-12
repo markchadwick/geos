@@ -27,6 +27,6 @@ void log_and_exit(const char *fmt, ...) {
   exit(1);
 }
 
-void initializeGEOS() {
-  initGEOS(notice, notice);
+GEOSContextHandle_t initializeGEOS() {
+  return initGEOS_r(notice, notice);
 }
