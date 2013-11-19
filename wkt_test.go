@@ -5,7 +5,10 @@ import (
 )
 
 var _ = spec.Suite("WKT Reader", func(c *spec.C) {
-	r := NewWKTReader()
+	h := NewHandle()
+	defer h.Destroy()
+
+	r := h.NewWKTReader()
 	defer r.Destroy()
 
 	c.It("should read a simple WKT to a geometry", func(c *spec.C) {
@@ -17,10 +20,13 @@ var _ = spec.Suite("WKT Reader", func(c *spec.C) {
 })
 
 var _ = spec.Suite("WKT Writer", func(c *spec.C) {
-	r := NewWKTReader()
+	h := NewHandle()
+	defer h.Destroy()
+
+	r := h.NewWKTReader()
 	defer r.Destroy()
 
-	w := NewWKTWriter()
+	w := h.NewWKTWriter()
 	defer w.Destroy()
 
 	c.It("should read a geometry to WKT", func(c *spec.C) {

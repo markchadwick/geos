@@ -18,7 +18,10 @@ import (
 // 0101000000287E8CB96B3552C0B84082E2C7084640  POINT(-72.8347 44.0686)
 // 0101000000865AD3BCE32452C07B14AE47E11A4640  POINT(-72.5764 44.21)
 var _ = spec.Suite("WKB Reader", func(c *spec.C) {
-	r := NewWKBReader()
+	h := NewHandle()
+	defer h.Destroy()
+
+	r := h.NewWKBReader()
 	defer r.Destroy()
 
 	c.It("should read a simple WKB to a geometry", func(c *spec.C) {
@@ -33,14 +36,17 @@ var _ = spec.Suite("WKB Reader", func(c *spec.C) {
 })
 
 var _ = spec.Suite("WKB Writer", func(c *spec.C) {
-	r := NewWKBReader()
+	h := NewHandle()
+	defer h.Destroy()
+
+	r := h.NewWKBReader()
 	defer r.Destroy()
 
-	w := NewWKBWriter()
+	w := h.NewWKBWriter()
 	defer w.Destroy()
 
 	c.It("should write a geometry to WKB", func(c *spec.C) {
-		point, _ := GeomFromWKT("POINT(1.2345 2.3456)")
+		point, _ := DefaultWKTReader.Read("POINT(1.2345 2.3456)")
 		b := w.Write(point)
 
 		p, err := r.Read(b)
