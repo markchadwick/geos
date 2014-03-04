@@ -21,6 +21,10 @@ func (cs *CoordSequence) SetZ(idx uint, v float64) {
 	C.GEOSCoordSeq_setZ_r(cs.ctx, cs.cs, C.uint(idx), C.double(v))
 }
 
+func (cs *CoordSequence) Destroy() {
+	C.GEOSCoordSeq_destroy_r(cs.ctx, cs.cs)
+}
+
 func (cs *CoordSequence) Point() (*Geometry, error) {
 	geom := C.GEOSGeom_createPoint_r(cs.ctx, cs.cs)
 	if geom == nil {
