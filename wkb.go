@@ -58,14 +58,16 @@ type WKBWriter struct {
 
 func (w *WKBWriter) Write(geom *Geometry) []byte {
 	size := C.size_t(1)
-	cs := C.GEOSWKBWriter_write_r(w.ctx, w.w, geom.geom, &size)
-	return C.GoBytes(unsafe.Pointer(cs), C.int(size))
+	cs := unsafe.Pointer(C.GEOSWKBWriter_write_r(w.ctx, w.w, geom.geom, &size))
+	defer C.free(cs)
+	return C.GoBytes(cs, C.int(size))
 }
 
 func (w *WKBWriter) WriteHex(geom *Geometry) []byte {
 	size := C.size_t(1)
-	cs := C.GEOSWKBWriter_writeHEX_r(w.ctx, w.w, geom.geom, &size)
-	return C.GoBytes(unsafe.Pointer(cs), C.int(size))
+	cs := unsafe.Pointer(C.GEOSWKBWriter_writeHEX_r(w.ctx, w.w, geom.geom, &size))
+	defer C.free(cs)
+	return C.GoBytes(cs, C.int(size))
 }
 
 func (w *WKBWriter) Destroy() {
