@@ -25,4 +25,11 @@ var _ = spec.Suite("Geometry", func(c *spec.C) {
 		c.Assert(int(JoinMitre)).Equals(2)
 		c.Assert(int(JoinBevel)).Equals(3)
 	})
+
+	c.It("should calculate the area", func(c *spec.C) {
+		square, err := DefaultWKTReader.Read("POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))")
+		c.Assert(err).IsNil()
+		c.Assert(square).NotNil()
+		c.Assert(square.Area()).Equals(1.0000)
+	})
 })

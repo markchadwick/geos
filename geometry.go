@@ -36,6 +36,12 @@ func (g *Geometry) Poly() *Geometry {
 	return &Geometry{g.ctx, geom}
 }
 
+func (g *Geometry) Area() float64 {
+	var area C.double
+	C.GEOSArea_r(g.ctx, g.geom, &area)
+	return float64(area)
+}
+
 // ----------------------------------------------------------------------------
 // Linearref methods
 
